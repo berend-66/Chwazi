@@ -48,13 +48,25 @@
   // Rigging: 4 quick taps in the top-left corner during IDLE cycle the state.
   let rigState = 'off'; // 'off' | 'win' | 'lose'
   let rigTapTimes = [];
+  let rigHideTimer = null;
   const RIG_ZONE = 80;
   const RIG_TAP_WINDOW = 1500;
   const RIG_TAP_COUNT = 4;
+  const RIG_INDICATOR_VISIBLE_MS = 2000;
 
   function updateRigIndicator() {
     rigIndicator.className = 'rig-indicator';
-    if (rigState !== 'off') rigIndicator.classList.add(rigState);
+    if (rigState !== 'off') {
+      rigIndicator.classList.add(rigState);
+      rigIndicator.classList.add('visible');
+      if (rigHideTimer) clearTimeout(rigHideTimer);
+      rigHideTimer = setTimeout(() => {
+        rigIndicator.classList.remove('visible');
+      }, RIG_INDICATOR_VISIBLE_MS);
+    } else if (rigHideTimer) {
+      clearTimeout(rigHideTimer);
+      rigHideTimer = null;
+    }
   }
 
   function cycleRigState() {
