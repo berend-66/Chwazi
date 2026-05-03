@@ -223,11 +223,22 @@
 
   function drawWinner(p, now) {
     const elapsed = now - resultStart;
-    const t = Math.min(1, elapsed / 600);
+    const t = Math.min(1, elapsed / 500);
     const eased = 1 - Math.pow(1 - t, 3);
-    const r = 60 + eased * Math.max(window.innerWidth, window.innerHeight) * 1.4;
+    const baseRadius = 60;
+    const targetRadius = 80;
+    const radius = baseRadius + (targetRadius - baseRadius) * eased
+      + Math.sin(now / 250) * 3;
+    const lineWidth = 8 + eased * 4;
+
     ctx.beginPath();
-    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+    ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+    ctx.strokeStyle = p.color;
+    ctx.lineWidth = lineWidth;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
     ctx.fillStyle = p.color;
     ctx.fill();
   }
