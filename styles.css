@@ -73,6 +73,21 @@ html, body {
   z-index: 10;
 }
 
+.rig-indicator {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: transparent;
+  transition: background 0.2s;
+  pointer-events: none;
+}
+
+.rig-indicator.win { background: #3bd97a; }
+.rig-indicator.lose { background: #ff3b5c; }
+
 .settings-btn:hover {
   background: rgba(255, 255, 255, 0.15);
 }

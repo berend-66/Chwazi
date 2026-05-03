@@ -3,6 +3,7 @@
   const ctx = canvas.getContext('2d');
   const hint = document.getElementById('hint');
   const settingsBtn = document.getElementById('settingsBtn');
+  const rigIndicator = document.getElementById('rigIndicator');
   const settingsPanel = document.getElementById('settingsPanel');
   const closeSettings = document.getElementById('closeSettings');
   const modeSelector = document.getElementById('modeSelector');
@@ -39,9 +40,38 @@
 
   let phase = STATE.IDLE;
   let pointers = new Map(); // id -> pointer
+  let pointerOrder = [];    // ids in placement order; last entry = most recent
   let selectionStart = 0;   // ms timestamp when waiting started/restarted
   let resultStart = 0;
   let nextColorIdx = 0;
+
+  // Rigging: 4 quick taps in the top-left corner during IDLE cycle the state.
+  let rigState = 'off'; // 'off' | 'win' | 'lose'
+  let rigTapTimes = [];
+  const RIG_ZONE = 80;
+  const RIG_TAP_WINDOW = 1500;
+  const RIG_TAP_COUNT = 4;
+
+  function updateRigIndicator() {
+    rigIndicator.className = 'rig-indicator';
+    if (rigState !== 'off') rigIndicator.classList.add(rigState);
+  }
+
+  function cycleRigState() {
+    rigState = rigState === 'off' ? 'win' : rigState === 'win' ? 'lose' : 'off';
+    updateRigIndicator();
+    if (settings.vibrate && navigator.vibrate) navigator.vibrate(30);
+  }
+
+  function handleRigTap(e) {
+    const now = performance.now();
+    rigTapTimes = rigTapTimes.filter(t => now - t < RIG_TAP_WINDOW);
+    rigTapTimes.push(now);
+    if (rigTapTimes.length >= RIG_TAP_COUNT) {
+      cycleRigState();
+      rigTapTimes = [];
+    }
+  }
 
   function resize() {
     const dpr = window.devicePixelRatio || 1;
@@ -80,6 +110,7 @@
       order: null,       // 1-based number in 'order' mode
       shrink: false,     // animate out in 'one' mode (losers)
     });
+    pointerOrder.push(e.pointerId);
     onPointersChanged();
   }
 
@@ -93,6 +124,7 @@
   function removePointer(e) {
     if (!pointers.has(e.pointerId)) return;
     pointers.delete(e.pointerId);
+    pointerOrder = pointerOrder.filter(id => id !== e.pointerId);
     onPointersChanged();
   }
 
@@ -125,7 +157,17 @@
     const ids = [...pointers.keys()];
     if (settings.mode === 'one') {
       if (ids.length < 2) return false; // need at least 2 to pick one
-      const winner = ids[Math.floor(Math.random() * ids.length)];
+      let winner;
+      const lastId = pointerOrder[pointerOrder.length - 1];
+      const lastValid = lastId !== undefined && pointers.has(lastId);
+      if (rigState === 'win' && lastValid) {
+        winner = lastId;
+      } else if (rigState === 'lose' && lastValid && ids.length >= 2) {
+        const others = ids.filter(id => id !== lastId);
+        winner = others[Math.floor(Math.random() * others.length)];
+      } else {
+        winner = ids[Math.floor(Math.random() * ids.length)];
+      }
       for (const [id, p] of pointers) {
         if (id === winner) {
           p.selected = true;
@@ -327,6 +369,14 @@
 
   canvas.addEventListener('pointerdown', e => {
     e.preventDefault();
+    if (
+      phase === STATE.IDLE &&
+      e.clientX < RIG_ZONE &&
+      e.clientY < RIG_ZONE
+    ) {
+      handleRigTap(e);
+      return;
+    }
     canvas.setPointerCapture(e.pointerId);
     addPointer(e);
   });
