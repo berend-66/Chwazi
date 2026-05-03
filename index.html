@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#111111" />
+  <title>Finger Picker</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <canvas id="stage"></canvas>
+
+  <div id="hint" class="hint">Place fingers on the screen</div>
+
+  <button id="settingsBtn" class="settings-btn" aria-label="Settings">
+    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"></circle>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+    </svg>
+  </button>
+
+  <div id="settingsPanel" class="settings-panel hidden">
+    <div class="settings-card">
+      <h2>Settings</h2>
+
+      <div class="setting-group">
+        <label>Mode</label>
+        <div class="segmented" id="modeSelector">
+          <button data-mode="one" class="active">One</button>
+          <button data-mode="groups">Groups</button>
+          <button data-mode="order">Order</button>
+        </div>
+      </div>
+
+      <div class="setting-group" id="groupsSetting">
+        <label>Number of groups: <span id="groupsValue">2</span></label>
+        <input type="range" id="groupsSlider" min="2" max="8" value="2" step="1" />
+      </div>
+
+      <div class="setting-group">
+        <label>Selection delay: <span id="delayValue">3.0</span> s</label>
+        <input type="range" id="delaySlider" min="1" max="6" value="3" step="0.5" />
+      </div>
+
+      <div class="setting-group">
+        <label class="checkbox">
+          <input type="checkbox" id="vibrateToggle" checked />
+          <span>Vibrate on pick</span>
+        </label>
+      </div>
+
+      <button id="closeSettings" class="close-btn">Done</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
