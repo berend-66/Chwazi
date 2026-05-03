@@ -223,24 +223,23 @@
 
   function drawWinner(p, now) {
     const elapsed = now - resultStart;
-    const t = Math.min(1, elapsed / 500);
+    const t = Math.min(1, elapsed / 600);
     const eased = 1 - Math.pow(1 - t, 3);
-    const baseRadius = 60;
-    const targetRadius = 80;
-    const radius = baseRadius + (targetRadius - baseRadius) * eased
-      + Math.sin(now / 250) * 3;
-    const lineWidth = 8 + eased * 4;
+
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const maxDist = Math.hypot(
+      Math.max(p.x, w - p.x),
+      Math.max(p.y, h - p.y)
+    );
+    const innerRadius = 75 + Math.sin(now / 250) * 3;
+    const outerRadius = innerRadius + eased * (maxDist + 80);
 
     ctx.beginPath();
-    ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
-    ctx.strokeStyle = p.color;
-    ctx.lineWidth = lineWidth;
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
+    ctx.arc(p.x, p.y, outerRadius, 0, Math.PI * 2);
+    ctx.arc(p.x, p.y, innerRadius, 0, Math.PI * 2);
     ctx.fillStyle = p.color;
-    ctx.fill();
+    ctx.fill('evenodd');
   }
 
   function drawShrinking(p, now) {
